@@ -1,145 +1,156 @@
-Terraform Deployment for Azure
-Denne Terraform-konfigurasjonen oppretter ressurser på Azure, inkludert virtuelle maskiner for webservere og databaser, og konfigurerer MySQL og Apache/PHP på de respektive VM-ene. Den inkluderer også en lastbalanserer for webservere og databaser.
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terraform Deployment for Azure</title>
+</head>
+<body>
 
-Forutsetninger
-Før du begynner, må du ha følgende på plass:
+<h1>Terraform Deployment for Azure</h1>
 
-Terraform: Terraform må være installert på systemet ditt. Se Terraform Installation Guide for installasjonsinstruksjoner.
-Azure CLI: Azure CLI må være installert for autentisering mot Azure. Se Azure CLI Installation for installasjonsinstruksjoner.
-Azure Subscription: Du må ha en aktiv Azure-konto og tilgang til ressursgruppen og abonnementet.
-Installasjon
-1. Logg inn på Azure
-Før du kan bruke Terraform med Azure, må du logge inn via Azure CLI:
+<p>Denne Terraform-konfigurasjonen oppretter ressurser på Azure, inkludert virtuelle maskiner for webservere og databaser, og konfigurerer MySQL og Apache/PHP på de respektive VM-ene. Den inkluderer også en lastbalanserer for webservere og databaser.</p>
 
-bash
-Copy code
-az login
-2. Konfigurer Terraform
-Oppdater terraform.tfvars med dine spesifikasjoner:
+<h2>Forutsetninger</h2>
+<p>Før du begynner, må du ha følgende på plass:</p>
+<ul>
+    <li><strong>Terraform:</strong> Terraform må være installert på systemet ditt. Se <a href="https://www.terraform.io/docs/install/index.html">Terraform Installation Guide</a> for installasjonsinstruksjoner.</li>
+    <li><strong>Azure CLI:</strong> Azure CLI må være installert for autentisering mot Azure. Se <a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI Installation</a> for installasjonsinstruksjoner.</li>
+    <li><strong>Azure Subscription:</strong> Du må ha en aktiv Azure-konto og tilgang til ressursgruppen og abonnementet.</li>
+</ul>
 
-subscription_id: Ditt Azure-abonnement ID.
-region: Azure-regionen der ressursene skal opprettes.
-resource_group_name: Navnet på ressursgruppen.
-vm_size: Størrelsen på virtuelle maskiner.
-admin_username og admin_password: Administrasjonsbrukernavn og passord for VM-ene.
-Eksempel på terraform.tfvars:
+<h2>Installasjon</h2>
 
-hcl
-Copy code
-region              = "West Europe"
-vm_size             = "Standard_B1s"  # Free student-tier size
+<h3>1. Logg inn på Azure</h3>
+<p>Før du kan bruke Terraform med Azure, må du logge inn via Azure CLI:</p>
+<pre><code>az login</code></pre>
+
+<h3>2. Konfigurer Terraform</h3>
+<p>Oppdater <code>terraform.tfvars</code> med dine spesifikasjoner:</p>
+<ul>
+    <li><strong>subscription_id:</strong> Ditt Azure-abonnement ID.</li>
+    <li><strong>region:</strong> Azure-regionen der ressursene skal opprettes.</li>
+    <li><strong>resource_group_name:</strong> Navnet på ressursgruppen.</li>
+    <li><strong>vm_size:</strong> Størrelsen på virtuelle maskiner.</li>
+    <li><strong>admin_username og admin_password:</strong> Administrasjonsbrukernavn og passord for VM-ene.</li>
+</ul>
+<p>Eksempel på <code>terraform.tfvars</code>:</p>
+<pre><code>
+region = "West Europe"
+vm_size = "Standard_B1s"  # Free student-tier size
 resource_group_name = "my-resource-group"
-admin_username      = "admin123"
-admin_password      = "Password123!"
-db_lb_public_ip     = "your-load-balancer-ip-here"  # Sett dette til din Load Balancer IP
-3. Initialiser Terraform
-Kjør følgende kommando i katalogen der Terraform-konfigurasjonen er plassert for å initialisere Terraform:
+admin_username = "admin123"
+admin_password = "Password123!"
+db_lb_public_ip = "your-load-balancer-ip-here"  # Sett dette til din Load Balancer IP
+</code></pre>
 
-bash
-Copy code
-terraform init
-4. Kjør Terraform Plan
-Kjør denne kommandoen for å vise hva som vil bli opprettet på Azure:
+<h3>3. Initialiser Terraform</h3>
+<p>Kjør følgende kommando i katalogen der Terraform-konfigurasjonen er plassert for å initialisere Terraform:</p>
+<pre><code>terraform init</code></pre>
 
-bash
-Copy code
-terraform plan
-5. Kjør Terraform Apply
-For å opprette ressursene på Azure, kjør følgende kommando:
+<h3>4. Kjør Terraform Plan</h3>
+<p>Kjør denne kommandoen for å vise hva som vil bli opprettet på Azure:</p>
+<pre><code>terraform plan</code></pre>
 
-bash
-Copy code
-terraform apply
-Følg instruksjonene i Terraform for å bekrefte opprettelsen av ressursene.
+<h3>5. Kjør Terraform Apply</h3>
+<p>For å opprette ressursene på Azure, kjør følgende kommando:</p>
+<pre><code>terraform apply</code></pre>
+<p>Følg instruksjonene i Terraform for å bekrefte opprettelsen av ressursene.</p>
 
-MySQL og Webserver Installasjon via Cloud-init
-Terraform-konfigurasjonen inkluderer to skript (cloud-init-mysql.sh og cloud-init-web.sh) som blir brukt til å installere og konfigurere MySQL og Apache/PHP på virtuelle maskiner (VM-er).
+<h2>MySQL og Webserver Installasjon via Cloud-init</h2>
 
-1. MySQL Server Installering (på Database VM-er)
-På database-VM-ene blir følgende handlinger utført:
+<p>Terraform-konfigurasjonen inkluderer to skript (<code>cloud-init-mysql.sh</code> og <code>cloud-init-web.sh</code>) som blir brukt til å installere og konfigurere MySQL og Apache/PHP på virtuelle maskiner (VM-er).</p>
 
-Oppdatering av systemet:
+<h3>1. MySQL Server Installering (på Database VM-er)</h3>
+<p>På database-VM-ene blir følgende handlinger utført:</p>
+<ul>
+    <li><strong>Oppdatering av systemet:</strong></li>
+    <pre><code>apt-get update && apt-get upgrade -y</code></pre>
 
-bash
-Copy code
-apt-get update && apt-get upgrade -y
-Installasjon av MySQL:
+    <li><strong>Installasjon av MySQL:</strong></li>
+    <pre><code>apt-get install -y mysql-server</code></pre>
 
-bash
-Copy code
-apt-get install -y mysql-server
-Konfigurering av MySQL for å lytte på alle IP-adresser:
+    <li><strong>Konfigurering av MySQL for å lytte på alle IP-adresser:</strong></li>
+    <pre><code>sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf</code></pre>
 
-bash
-Copy code
-sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
-Sikre MySQL-installasjonen ved å sette et nytt passord og fjerne testdatabasen:
+    <li><strong>Sikre MySQL-installasjonen ved å sette et nytt passord og fjerne testdatabasen:</strong></li>
+    <pre><code>
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH 'mysql_native_password' BY 'rootpassword';"
+    mysql -e "DELETE FROM mysql.user WHERE User='';"
+    mysql -e "DROP DATABASE IF EXISTS test;"
+    mysql -e "FLUSH PRIVILEGES;"
+    </code></pre>
 
-bash
-Copy code
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH 'mysql_native_password' BY 'rootpassword';"
-mysql -e "DELETE FROM mysql.user WHERE User='';"
-mysql -e "DROP DATABASE IF EXISTS test;"
-mysql -e "FLUSH PRIVILEGES;"
-Opprettelse av applikasjonsdatabase og bruker:
+    <li><strong>Opprettelse av applikasjonsdatabase og bruker:</strong></li>
+    <pre><code>
+    mysql -u root -prootpassword -e "CREATE DATABASE appdb;"
+    mysql -u root -prootpassword -e "CREATE USER 'appuser'@'%' IDENTIFIED BY 'apppassword';"
+    mysql -u root -prootpassword -e "GRANT ALL PRIVILEGES ON appdb.* TO 'appuser'@'%';"
+    mysql -u root -prootpassword -e "FLUSH PRIVILEGES;"
+    </code></pre>
 
-bash
-Copy code
-mysql -u root -prootpassword -e "CREATE DATABASE appdb;"
-mysql -u root -prootpassword -e "CREATE USER 'appuser'@'%' IDENTIFIED BY 'apppassword';"
-mysql -u root -prootpassword -e "GRANT ALL PRIVILEGES ON appdb.* TO 'appuser'@'%';"
-mysql -u root -prootpassword -e "FLUSH PRIVILEGES;"
-Innsatt testdata i databasen:
+    <li><strong>Innsatt testdata i databasen:</strong></li>
+    <pre><code>
+    mysql -u root -prootpassword -e "USE appdb; CREATE TABLE greetings (id INT AUTO_INCREMENT PRIMARY KEY, message VARCHAR(255));"
+    mysql -u root -prootpassword -e "USE appdb; INSERT INTO greetings (message) VALUES ('Hello from MySQL!');"
+    </code></pre>
+</ul>
 
-bash
-Copy code
-mysql -u root -prootpassword -e "USE appdb; CREATE TABLE greetings (id INT AUTO_INCREMENT PRIMARY KEY, message VARCHAR(255));"
-mysql -u root -prootpassword -e "USE appdb; INSERT INTO greetings (message) VALUES ('Hello from MySQL!');"
-2. Apache og PHP Installering (på Webserver VM-er)
-På webserver-VM-ene blir følgende utført:
+<h3>2. Apache og PHP Installering (på Webserver VM-er)</h3>
+<p>På webserver-VM-ene blir følgende utført:</p>
+<ul>
+    <li><strong>Installasjon av Apache, PHP og MySQL-klienten:</strong></li>
+    <pre><code>apt-get update</code></pre>
+    <pre><code>apt-get install -y apache2 php php-mysql</code></pre>
 
-Installasjon av Apache, PHP og MySQL-klienten:
+    <li><strong>Opprettelse av en PHP-fil som henter data fra MySQL (Lastbalansererens IP brukes her):</strong></li>
+    <pre><code>
+    cat <<EOF > /var/www/html/index.php
+    <?php
+    \$servername = "${db_lb_ip}";
+    \$username = "appuser";
+    \$password = "apppassword";
+    \$dbname = "appdb";
 
-bash
-Copy code
-apt-get update
-apt-get install -y apache2 php php-mysql
-Opprettelse av en PHP-fil som henter data fra MySQL (Lastbalansererens IP brukes her):
+    // Create connection
+    \$conn = new mysqli(\$servername, \$username, \$password, \$dbname);
 
-php
-Copy code
-cat <<EOF > /var/www/html/index.php
-<?php
-\$servername = "${db_lb_ip}";
-\$username = "appuser";
-\$password = "apppassword";
-\$dbname = "appdb";
-
-// Create connection
-\$conn = new mysqli(\$servername, \$username, \$password, \$dbname);
-
-// Check connection
-if (\$conn->connect_error) {
-    die("Connection failed: " . \$conn->connect_error);
-}
-
-// Fetch data
-\$sql = "SELECT message FROM greetings";
-\$result = \$conn->query(\$sql);
-
-if (\$result->num_rows > 0) {
-    // Output data of each row
-    while(\$row = \$result->fetch_assoc()) {
-        echo "Message: " . \$row["message"];
+    // Check connection
+    if (\$conn->connect_error) {
+        die("Connection failed: " . \$conn->connect_error);
     }
-} else {
-    echo "0 results";
-}
-\$conn->close();
-?>
-EOF
-Restart Apache:
 
-bash
-Copy code
-systemctl restart apache2
+    // Fetch data
+    \$sql = "SELECT message FROM greetings";
+    \$result = \$conn->query(\$sql);
+
+    if (\$result->num_rows > 0) {
+        // Output data of each row
+        while(\$row = \$result->fetch_assoc()) {
+            echo "Message: " . \$row["message"];
+        }
+    } else {
+        echo "0 results";
+    }
+    \$conn->close();
+    ?>
+    EOF
+    </code></pre>
+
+    <li><strong>Restart Apache:</strong></li>
+    <pre><code>systemctl restart apache2</code></pre>
+</ul>
+
+<h2>Lastbalansering</h2>
+
+
+<h2>Feilsøking</h2>
+<h3>1. Autentisering</h3>
+<p>Hvis du får problemer med autentisering, kan du bruke Azure CLI til å logge inn før du kjører Terraform:</p>
+<pre><code>az login</code></pre>
+
+<h3>2. Oppdatering av tilstanden</h3>
+<p>Hvis Terraform-klienten ikke finner nødvendige ressurser, kan du bruke <code>terraform refresh</code> for å oppdatere tilstanden før du fortsetter:</p>
+<pre><code>terraform refresh</code></pre>
+
+</bod
