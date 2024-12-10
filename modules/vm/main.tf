@@ -38,6 +38,20 @@ resource "azurerm_virtual_machine" "web_vm" {
   tags = var.tags
 }
 
+# Web VM Custom Script Extension
+resource "azurerm_virtual_machine_extension" "web_install" {
+  name                  = "install-web-tools"
+  virtual_machine_id    = azurerm_virtual_machine.web_vm.id
+  publisher             = "Microsoft.Azure.Extensions"
+  type                  = "CustomScript"
+  type_handler_version  = "2.1"
+  
+  settings = jsonencode({
+    script = filebase64("modules/vm/cloud-init-web.sh")
+
+  })
+}
+
 # Database VMs (2 instances)
 resource "azurerm_virtual_machine" "db_vm" {
   count                 = 2
@@ -79,6 +93,19 @@ resource "azurerm_virtual_machine" "db_vm" {
   tags = var.tags
 }
 
+# Database VM Custom Script Extension
+resource "azurerm_virtual_machine_extension" "db_install" {
+  count                 = 2
+  name                  = "mysql-setup-${count.index + 1}"
+  virtual_machine_id    = azurerm_virtual_machine.db_vm[count.index].id
+  publisher             = "Microsoft.Azure.Extensions"
+  type                  = "CustomScript"
+  type_handler_version  = "2.1"
+  
+  settings = jsonencode({
+    script = filebase64("modules/vm/cloud-init-mysql.sh")
+  })
+}
 # Web VM Network Interface
 resource "azurerm_network_interface" "web_nic" {
   name                 = "web-nic"
@@ -92,6 +119,30 @@ resource "azurerm_network_interface" "web_nic" {
   }
 }
 
+# Web VM Network Security Group
+resource "azurerm_network_security_group" "web_nsg" {
+  name                = "web-nsg"
+  location            = var.region
+  resource_group_name = var.resource_group_name
+
+  security_rule {
+    name                       = "AllowHTTP"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+# Associate NSG with existing Web NIC
+resource "azurerm_network_interface_security_group_association" "web_nic_nsg" {
+  network_interface_id      = azurerm_network_interface.web_nic.id
+  network_security_group_id = azurerm_network_security_group.web_nsg.id
+}
 # Public IP for Web VM
 resource "azurerm_public_ip" "web_public_ip" {
   name                = "web-public-ip"
@@ -121,6 +172,3 @@ resource "azurerm_network_interface_backend_address_pool_association" "db_nic_po
   backend_address_pool_id = var.db_backend_pool_id
   ip_configuration_name   = azurerm_network_interface.db_nic[count.index].ip_configuration[0].name
 }
-
-
-
