@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<h1>Terraform Azure Infrastructure Setup</h1>
+<h1>Terraform Azure MySQL</h1>
 
 <p>Dette prosjektet bruker Terraform for å sette opp og administrere en infrastruktur på Azure. Infrastrukturene som implementeres inkluderer virtuelle maskiner (VM-er), lastbalanserer, og nettverkskomponenter. Dette prosjektet konfigurerer også MySQL og en webserver på de virtuelle maskinene ved hjelp av <code>cloud-init</code> skript.</p>
 
