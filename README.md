@@ -103,7 +103,7 @@ provider "azurerm" {
 <p>Dette fjerner alle ressurser fra Azure og stopper eventuelle kostnader som kan påløpe.</p>
 
 <h2>Konklusjon</h2>
-<p>Dette Terraform-prosjektet gir deg en fullstendig infrastruktur med virtuelle maskiner, nettverkskomponenter og lastbalansering på Azure. Det er bygget for å være skalerbart og lett å bruke for å håndtere applikasjonsdrift i et produksjonsmiljø.</p>
+<p>Dette Terraform-prosjektet gir deg en fullstendig infrastruktur med virtuelle maskiner, nettverkskomponenter og lastbalansering med MySQL Dtabase og webtjeneste.</p>
 
 </body>
 </html>
