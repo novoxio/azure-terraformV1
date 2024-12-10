@@ -17,6 +17,14 @@
     <li><a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI</a> (Versjon 2.0 eller høyere)</li>
     <li>En aktiv Azure-konto</li>
 </ul>
+<p>I tillegg må du eksplisitt angi administrasjonsbrukernavn og passord i <code>terraform.tfvars</code>-filen. Eksempel:</p>
+<pre><code># terraform.tfvars
+region = "West Europe"
+vm_size = "Standard_B1s"  # Free student-tier size
+resource_group_name = "my-resource-group"
+admin_username = "<brukernavn til admin>"
+admin_password = "<passord til admin>"
+</code></pre>
 
 <h2>Steg 1: Forberedelser</h2>
 
@@ -77,9 +85,6 @@ provider "azurerm" {
 
 <h3>3. Test Failover MySQL-tilkobling</h3>
 <p>Test ved å slå av en DB_VM. Refreshe siden, og du ser at den byttet til den andre DB-VM-en. Statusen til den andre VM-en skal være "failed", og tilkoblingen til databasen vil bytte over til partneren.</p>
-
-<h2>Testing PHP-siden</h2>
-<p>For å teste at PHP fungerer som det skal, kan du åpne nettleseren din og navigere til <code>http://&lt;public-ip-adresse&gt;/db_status.php</code> på den virtuelle maskinen som kjører webserveren. PHP-siden skal vise status for tilkobling til databasen og hente innhold fra databasen.</p>
 
 <h2>cloud-init-web.sh</h2>
 <p>Dette skriptet brukes til å konfigurere webserveren (Apache og PHP) på de virtuelle maskinene. Den installerer Apache, PHP, og PHP-MySQL-modulen, og sørger for at webserveren er oppe og kjører. Den sjekker også statusen til databasene og henter ut data.</p>
