@@ -14,7 +14,7 @@
 <p>Før du kan bruke dette Terraform-prosjektet, må du ha følgende installert:</p>
 <ul>
     <li><a href="https://www.terraform.io/downloads.html">Terraform</a> (Versjon 1.0 eller høyere)</li>
-    <li><a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI</a> (Versjon 2.0 eller høyere)</li>
+    <li><a href="https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell">PowerShell</a> (Versjon 7 eller høyere)</li>
     <li>En aktiv Azure-konto</li>
 </ul>
 <p>I tillegg må du angi administrasjonsbrukernavn og passord i <code>terraform.tfvars</code>-filen som blir brukt til innloggingsdata på VM-ene</p>
