@@ -17,7 +17,7 @@
     <li><a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI</a> (Versjon 2.0 eller høyere)</li>
     <li>En aktiv Azure-konto</li>
 </ul>
-<p>I tillegg må du angi administrasjonsbrukernavn og passord i <code>terraform.tfvars</code>-filen som blir brukt som innloggingsdata på VM-ene</p>
+<p>I tillegg må du angi administrasjonsbrukernavn og passord i <code>terraform.tfvars</code>-filen som blir brukt til innloggingsdata på VM-ene</p>
 <pre><code># terraform.tfvars
 region = "West Europe"
 vm_size = "Standard_B1s"  # Free student-tier size
