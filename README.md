@@ -3,154 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terraform Deployment for Azure</title>
+    <title>Terraform Prosjekt for Azure Infrastruktur</title>
 </head>
 <body>
 
-<h1>Terraform Deployment for Azure</h1>
+    <h1>Terraform Prosjekt for Azure Infrastruktur</h1>
 
-<p>Denne Terraform-konfigurasjonen oppretter ressurser på Azure, inkludert virtuelle maskiner for webservere og databaser, og konfigurerer MySQL og Apache/PHP på de respektive VM-ene. Den inkluderer også en lastbalanserer for webservere og databaser.</p>
+    <p>Dette prosjektet bruker <strong>Terraform</strong> for å sette opp og administrere en infrastruktur på <strong>Azure</strong>, inkludert virtuelle maskiner (VM), lastbalanserer, og nettverkskomponenter. Skriptene inkluderer også <strong>cloud-init</strong> for automatisk konfigurasjon av MySQL og webserver på de virtuelle maskinene.</p>
 
-<h2>Forutsetninger</h2>
-<p>Før du begynner, må du ha følgende på plass:</p>
-<ul>
-    <li><strong>Terraform:</strong> Terraform må være installert på systemet ditt. Se <a href="https://www.terraform.io/docs/install/index.html">Terraform Installation Guide</a> for installasjonsinstruksjoner.</li>
-    <li><strong>Azure CLI:</strong> Azure CLI må være installert for autentisering mot Azure. Se <a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI Installation</a> for installasjonsinstruksjoner.</li>
-    <li><strong>Azure Subscription:</strong> Du må ha en aktiv Azure-konto og tilgang til ressursgruppen og abonnementet.</li>
-</ul>
+    <h2>Forutsetninger</h2>
+    <p>Før du kan bruke dette Terraform-prosjektet, må du ha følgende installert:</p>
+    <ul>
+        <li><strong>Terraform</strong> (Versjon 1.0 eller høyere)</li>
+        <li><strong>Azure CLI</strong> (Versjon 2.0 eller høyere)</li>
+        <li>En aktiv <strong>Azure-konto</strong></li>
+    </ul>
 
-<h2>Installasjon</h2>
+    <h2>Steg 1: Forberedelser</h2>
+    <h3>1. Autentisering mot Azure:</h3>
+    <p>Kjør følgende kommando for å logge inn i Azure via CLI:</p>
+    <pre><code>az login</code></pre>
+    <p>Dette åpner en nettleser der du kan logge inn med Azure-kontoen din.</p>
 
-<h3>1. Logg inn på Azure</h3>
-<p>Før du kan bruke Terraform med Azure, må du logge inn via Azure CLI:</p>
-<pre><code>az login</code></pre>
+    <h3>2. Sett Subscription ID i provider.tf:</h3>
+    <p>Du må angi din Azure Subscription ID i <strong>provider.tf</strong>:</p>
+    <pre><code>provider "azurerm" {
+  features {}
+  subscription_id = "&lt;din_subscription_id&gt;"
+}</code></pre>
 
-<h3>2. Konfigurer Terraform</h3>
-<p>Oppdater <code>terraform.tfvars</code> med dine spesifikasjoner:</p>
-<ul>
-    <li><strong>subscription_id:</strong> Ditt Azure-abonnement ID.</li>
-    <li><strong>region:</strong> Azure-regionen der ressursene skal opprettes.</li>
-    <li><strong>resource_group_name:</strong> Navnet på ressursgruppen.</li>
-    <li><strong>vm_size:</strong> Størrelsen på virtuelle maskiner.</li>
-    <li><strong>admin_username og admin_password:</strong> Administrasjonsbrukernavn og passord for VM-ene.</li>
-</ul>
-<p>Eksempel på <code>terraform.tfvars</code>:</p>
-<pre><code>
-region = "West Europe"
-vm_size = "Standard_B1s"  # Free student-tier size
-resource_group_name = "my-resource-group"
-admin_username = "admin123"
-admin_password = "Password123!"
-db_lb_public_ip = "your-load-balancer-ip-here"  # Sett dette til din Load Balancer IP
-</code></pre>
+    <h2>Steg 2: Terraform Konfigurasjon</h2>
+    <p>Prosjektet består av tre hovedmoduler:</p>
+    <ul>
+        <li><strong>Network Module</strong>: Konfigurerer et virtuelt nettverk og subnets.</li>
+        <li><strong>VM Module</strong>: Oppretter virtuelle maskiner som er konfigurert med MySQL og webserver.</li>
+        <li><strong>Load Balancer Module</strong>: Konfigurerer lastbalanserer for høyt tilgjengelige applikasjoner.</li>
+    </ul>
 
-<h3>3. Initialiser Terraform</h3>
-<p>Kjør følgende kommando i katalogen der Terraform-konfigurasjonen er plassert for å initialisere Terraform:</p>
-<pre><code>terraform init</code></pre>
+    <h3>Struktur</h3>
+    <ul>
+        <li><strong>variables.tf</strong>: Definerer variabler som region, størrelse på VM, og brukernavn/passord for administrasjon.</li>
+        <li><strong>terraform.tfvars</strong>: Her kan du endre variablene til ditt behov.</li>
+        <li><strong>main.tf</strong>: Konfigurerer ressursene i Azure, inkludert virtuelle maskiner, nettverk og lastbalanserer.</li>
+        <li><strong>modules/</strong>: Inneholder moduler for nettverk, VM, og lastbalanserer.</li>
+    </ul>
 
-<h3>4. Kjør Terraform Plan</h3>
-<p>Kjør denne kommandoen for å vise hva som vil bli opprettet på Azure:</p>
-<pre><code>terraform plan</code></pre>
+    <h2>Steg 3: Kjøring av Terraform</h2>
+    <ol>
+        <li><strong>Initialiser Terraform-prosjektet:</strong> Før du kan bruke Terraform, må du initialisere prosjektet:</li>
+        <pre><code>terraform init</code></pre>
+        <li><strong>Planlegg distribusjonen:</strong> Kjør kommandoen for å generere en plan for distribusjonen av infrastrukturen:</li>
+        <pre><code>terraform plan</code></pre>
+        <p>Dette gir deg en oversikt over hva som vil bli opprettet på Azure.</p>
+        <li><strong>Distribuer infrastrukturen:</strong> For å opprette ressursene i Azure, kjør:</li>
+        <pre><code>terraform apply</code></pre>
+        <p>Terraform vil be deg om å bekrefte ved å skrive <code>yes</code>.</p>
+        <li><strong>Ferdigstilling:</strong> Når Terraform er ferdig med distribusjonen, vil du få utdata med IP-adressen til de nye virtuelle maskinene og lastbalansereren i Azure GUI. Web-VM har en Offentlig IP.</li>
+    </ol>
 
-<h3>5. Kjør Terraform Apply</h3>
-<p>For å opprette ressursene på Azure, kjør følgende kommando:</p>
-<pre><code>terraform apply</code></pre>
-<p>Følg instruksjonene i Terraform for å bekrefte opprettelsen av ressursene.</p>
+    <h2>Steg 4: Testing av Web-applikasjon</h2>
+    <p>Etter at Terraform har opprettet ressursene, kan du teste PHP-applikasjonen ved å:</p>
+    <ol>
+        <li><strong>Hente IP-adressen:</strong> IP-adressen til webserveren skal være tilgjengelig etter distribusjon. Du kan finne denne i Terraform-utdataene eller via Azure-portalen.</li>
+        <li><strong>Test Websiden:</strong> Åpne nettleseren din og skriv inn <code>http://&lt;ip-adresse&gt;/db_setup.php</code>. Du bør se en PHP-side som bekrefter at serverne fungerer med status om DB-VM-tilkoblinger og database-melding.</li>
+        <li><strong>Test Failover MySQL-tilkobling:</strong> Test ved å slå av en DB-VM. Refreshe siden og du ser at den bytter til andre DB-VM. Statusen til andre VM-en blir "failed", og tilkoblingen til databasen blir byttet til partneren.</li>
+    </ol>
 
-<h2>MySQL og Webserver Installasjon via Cloud-init</h2>
+    <h3>Testing PHP-siden</h3>
+    <p>For å teste at PHP fungerer som det skal, kan du åpne nettleseren din og navigere til <code>http://&lt;ip-adresse&gt;/db_setup.php</code> til den virtuelle maskinen som kjører webserveren. PHP-siden skal vise status til tilkobling av database og hente innhold fra databasen.</p>
 
-<p>Terraform-konfigurasjonen inkluderer to skript (<code>cloud-init-mysql.sh</code> og <code>cloud-init-web.sh</code>) som blir brukt til å installere og konfigurere MySQL og Apache/PHP på virtuelle maskiner (VM-er).</p>
+    <h2>cloud-init-web.sh</h2>
+    <p>Dette skriptet brukes til å konfigurere webserveren (Apache og PHP) på de virtuelle maskinene. Den installerer Apache, PHP, og PHP-MySQL-modulen, og sørger for at webserveren er oppe og kjører, samtidig som det sjekker statusen til databasene og henter ut data.</p>
 
-<h3>1. MySQL Server Installering (på Database VM-er)</h3>
-<p>På database-VM-ene blir følgende handlinger utført:</p>
-<ul>
-    <li><strong>Oppdatering av systemet:</strong></li>
-    <pre><code>apt-get update && apt-get upgrade -y</code></pre>
+    <h2>cloud-init-mysql.sh</h2>
+    <p>Dette skriptet settes opp på de virtuelle maskinene som skal bruke MySQL, og utfører følgende:</p>
+    <ul>
+        <li>Installere og konfigurere MySQL</li>
+        <li>Sette opp replikering (hvis nødvendig)</li>
+        <li>Opprette en database og bruker</li>
+    </ul>
 
-    <li><strong>Installasjon av MySQL:</strong></li>
-    <pre><code>apt-get install -y mysql-server</code></pre>
+    <h2>Steg 5: Rydde opp</h2>
+    <p>Når du er ferdig med å teste infrastrukturen, kan du rydde opp ressursene som ble opprettet av Terraform:</p>
+    <pre><code>terraform destroy</code></pre>
+    <p>Dette fjerner alle ressurser fra Azure og stopper eventuelle kostnader som kan påløpe.</p>
 
-    <li><strong>Konfigurering av MySQL for å lytte på alle IP-adresser:</strong></li>
-    <pre><code>sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf</code></pre>
+    <h2>Konklusjon</h2>
+    <p>Dette Terraform-prosjektet gir deg en fullstendig infrastruktur med virtuelle maskiner, nettverkskomponenter, og lastbalansering på Azure. Det er bygget for å være skalerbart og lett å bruke for å håndtere applikasjonsdrift i et produksjonsmiljø.</p>
 
-    <li><strong>Sikre MySQL-installasjonen ved å sette et nytt passord og fjerne testdatabasen:</strong></li>
-    <pre><code>
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH 'mysql_native_password' BY 'rootpassword';"
-    mysql -e "DELETE FROM mysql.user WHERE User='';"
-    mysql -e "DROP DATABASE IF EXISTS test;"
-    mysql -e "FLUSH PRIVILEGES;"
-    </code></pre>
-
-    <li><strong>Opprettelse av applikasjonsdatabase og bruker:</strong></li>
-    <pre><code>
-    mysql -u root -prootpassword -e "CREATE DATABASE appdb;"
-    mysql -u root -prootpassword -e "CREATE USER 'appuser'@'%' IDENTIFIED BY 'apppassword';"
-    mysql -u root -prootpassword -e "GRANT ALL PRIVILEGES ON appdb.* TO 'appuser'@'%';"
-    mysql -u root -prootpassword -e "FLUSH PRIVILEGES;"
-    </code></pre>
-
-    <li><strong>Innsatt testdata i databasen:</strong></li>
-    <pre><code>
-    mysql -u root -prootpassword -e "USE appdb; CREATE TABLE greetings (id INT AUTO_INCREMENT PRIMARY KEY, message VARCHAR(255));"
-    mysql -u root -prootpassword -e "USE appdb; INSERT INTO greetings (message) VALUES ('Hello from MySQL!');"
-    </code></pre>
-</ul>
-
-<h3>2. Apache og PHP Installering (på Webserver VM-er)</h3>
-<p>På webserver-VM-ene blir følgende utført:</p>
-<ul>
-    <li><strong>Installasjon av Apache, PHP og MySQL-klienten:</strong></li>
-    <pre><code>apt-get update</code></pre>
-    <pre><code>apt-get install -y apache2 php php-mysql</code></pre>
-
-    <li><strong>Opprettelse av en PHP-fil som henter data fra MySQL (Lastbalansererens IP brukes her):</strong></li>
-    <pre><code>
-    cat <<EOF > /var/www/html/index.php
-    <?php
-    \$servername = "${db_lb_ip}";
-    \$username = "appuser";
-    \$password = "apppassword";
-    \$dbname = "appdb";
-
-    // Create connection
-    \$conn = new mysqli(\$servername, \$username, \$password, \$dbname);
-
-    // Check connection
-    if (\$conn->connect_error) {
-        die("Connection failed: " . \$conn->connect_error);
-    }
-
-    // Fetch data
-    \$sql = "SELECT message FROM greetings";
-    \$result = \$conn->query(\$sql);
-
-    if (\$result->num_rows > 0) {
-        // Output data of each row
-        while(\$row = \$result->fetch_assoc()) {
-            echo "Message: " . \$row["message"];
-        }
-    } else {
-        echo "0 results";
-    }
-    \$conn->close();
-    ?>
-    EOF
-    </code></pre>
-
-    <li><strong>Restart Apache:</strong></li>
-    <pre><code>systemctl restart apache2</code></pre>
-</ul>
-
-<h2>Lastbalansering</h2>
-
-
-<h2>Feilsøking</h2>
-<h3>1. Autentisering</h3>
-<p>Hvis du får problemer med autentisering, kan du bruke Azure CLI til å logge inn før du kjører Terraform:</p>
-<pre><code>az login</code></pre>
-
-<h3>2. Oppdatering av tilstanden</h3>
-<p>Hvis Terraform-klienten ikke finner nødvendige ressurser, kan du bruke <code>terraform refresh</code> for å oppdatere tilstanden før du fortsetter:</p>
-<pre><code>terraform refresh</code></pre>
-
-</bod
+</body>
+</html>
