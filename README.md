@@ -17,13 +17,13 @@
     <li><a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI</a> (Versjon 2.0 eller høyere)</li>
     <li>En aktiv Azure-konto</li>
 </ul>
-<p>I tillegg må du eksplisitt angi administrasjonsbrukernavn og passord i <code>terraform.tfvars</code>-filen. Eksempel:</p>
+<p>I tillegg må du eksplisitt angi administrasjonsbrukernavn og passord i <code>terraform.tfvars</code>-filen.</p>
 <pre><code># terraform.tfvars
 region = "West Europe"
 vm_size = "Standard_B1s"  # Free student-tier size
 resource_group_name = "my-resource-group"
-admin_username = "<brukernavn til admin>"
-admin_password = "<passord til admin>"
+<b>admin_username = "brukernavn til admin"</b>
+<b>admin_password = "passord til admin"</b>
 </code></pre>
 
 <h2>Steg 1: Forberedelser</h2>
